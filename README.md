@@ -93,7 +93,7 @@ conposer_plot(seqs.file="sequences.fasta", filename="geneplot.pdf", linecol="bla
 #### Examples
 
 ```r
-> conposer_plot(seqs.file="sequences.fasta", filename="geneplot.pdf", linecol="blue")
+> conposer_plot(seqs.file="sequences.fasta", filename="geneplot.pdf", linecol="red")
 using Gonnet
 pdf 
   2
