@@ -99,7 +99,7 @@ pdf
   2
 ```
 
-![Ex1](https://github.com/kevinsblake/ConPosER/blob/main/photos/example_01.png)
+![Ex1](https://github.com/kevinsblake/ConPosER/blob/main/photos/examples/example_01.png)
 
 ## References
 
