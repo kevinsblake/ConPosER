@@ -1,8 +1,11 @@
 
-conposer_id <- function(seqs.file, msa=c("ClustalW", "ClustalOmega", "Muscle")){
+conposer_id <- function(seqs.file, msa=c("ClustalW", "ClustalOmega", "Muscle"), gap.lim=0.30){
+  
+  # Import fasta file  
+  seqs.fasta <- readAAStringSet(seqs.file)
   
   # Generate MSA
-  seqs.aln <- msa(seqs.file, msa) # can also use "Muscle" etc
+  seqs.aln <- msa(seqs.fasta, msa) # can also use "Muscle" etc
   
   # Create empty dataframe template
   rows = c("-","A","C","D","E","F","G","H","I","K","L","M","N","P","Q","R","S","T","V","W","Y")
@@ -21,21 +24,27 @@ conposer_id <- function(seqs.file, msa=c("ClustalW", "ClustalOmega", "Muscle")){
   cons.mat2 <- cons.mat2 %>% rename(gap = "-") %>%
     tibble::rownames_to_column("pos")
   
-  # Get only columns with 1 AA (i.e. 100% conserved)
-  cons.cons <- cons.mat2 %>% filter(cons.mat2[,ncol(cons.mat2)] == 1 & gap == 0) %>% select(-gap) 
-  
+  # Filter output
+  cons.mat.fil <- cons.mat2 %>% filter(gap < length(seqs.fasta)) %>%
+    select(-pos) %>%
+    tibble::rownames_to_column("pos")
+  cons.fil.cons <- cons.mat.fil %>% filter(cons.mat.fil[,ncol(cons.mat.fil)] == 1 & gap == 0) %>% select(-gap) 
   
   # Print AA name at conserved position
-  cons.cons$AA <- names(cons.cons)[-1][max.col(cons.cons[-1] !=0, 'first')]
-  cons.find <- cons.cons[, c('pos', 'AA')]
+  cons.fil.cons$AA <- names(cons.fil.cons)[-1][max.col(cons.fil.cons[-1] !=0, 'first')]
+  cons.find <- cons.fil.cons[, c('pos', 'AA')]
   
   return(cons.find)
 }
 
-conposer_plot <- function(seqs.file, filename="geneplot.pdf", linecol="black", isFilter=FALSE){
+
+conposer_plot <- function(seqs.file, filename="geneplot.pdf", linecol="black", gap.lim=0.30){
+  
+  # Import fasta file
+  seqs.fasta <- readAAStringSet(seqs.file)
   
   # Generate MSA
-  seqs.aln <- msa(seqs.file, "ClustalOmega") # can also use "Muscle" etc
+  seqs.aln <- msa(seqs.fasta, "ClustalOmega") # can also use "Muscle" etc
   
   # Create empty dataframe template
   rows = c("-","A","C","D","E","F","G","H","I","K","L","M","N","P","Q","R","S","T","V","W","Y")
@@ -53,20 +62,14 @@ conposer_plot <- function(seqs.file, filename="geneplot.pdf", linecol="black", i
   cons.mat2 <- cons.mat2 %>% rename(gap = "-") %>%
     tibble::rownames_to_column("pos")
   
-  # Get only columns with 1 AA (i.e. 100% conserved)
-  cons.cons <- cons.mat2 %>% filter(cons.mat2[,ncol(cons.mat2)] == 1 & gap == 0)
+  # Filter output  
+  cons.mat.fil <- cons.mat2 %>% filter(gap < length(seqs.fasta)*gap.lim) %>% # Filter to exclude positions where >30% sequences have a gap
+    select(-pos) %>%
+    tibble::rownames_to_column("pos")
+  cons.fil.cons <- cons.mat.fil %>% filter(cons.mat.fil[,ncol(cons.mat.fil)] == 1 & gap == 0) %>% select(-gap) 
   
   # Save the plot as a function so can save it >> little hacky
-  plot <- function(){conposer_geneplot(cons.mat2, cons.cons, filename, linecol)}
-  
-  if (isFilter){
-    cons.mat.fil <- cons.mat2 %>% filter(gap < length(seqs.file)*0.05) %>% # Filter to exclude positions where >5% sequences have a gap
-      select(-pos) %>%
-      tibble::rownames_to_column("pos")
-    cons.fil.cons <- cons.mat.fil %>% filter(cons.mat.fil[,ncol(cons.mat.fil)] == 1 & gap == 0) %>% select(-gap) 
-    
-    plot <- function(){conposer_geneplot(cons.mat.fil, cons.fil.cons, filename, linecol)}
-  }
+  plot <- function(){conposer_geneplot(cons.mat.fil, cons.fil.cons, filename, linecol)}
   
   return(plot())
 }

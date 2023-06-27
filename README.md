@@ -7,16 +7,20 @@ The sequence-structure-function paradigm follows that a protein’s primary sequ
 
 `ConPosER` includes two functions:
 1. `conposer_id()`: Takes input AA sequences, and outputs list of 100% conserved positions and the residue observed there.
-2. `conposer_plot()`: Plots the 100% conserved positions on 2D gene map. Calls a sub-function `conposer_geneplot()` which includes the formatting for the geneplots.
+2. `conposer_plot()`: Plots the 100% conserved positions on 2D gene map, plus a barplot of the number of AAs observed at each position. Calls a sub-function `conposer_geneplot()` which includes the formatting for the geneplot.
 
 # Content
-
 
 ## Install
 
 Install directly from GitHub:
 ```r
 source("https://raw.github.com/kevinsblake/ConPosER/main/ConPosE.R")
+```
+
+Alternatively, can download and then install using the filepath:
+```r
+source("dir1/dir2/pathotype.R")
 ```
 
 ## Functions
@@ -32,46 +36,70 @@ Function to list each conserved position and the amino acid at that positions.
 ```r
 library(Biostrings)
 library(msa)
+library(dplyr)
 
-seqs.file <- readAAStringSet("data/sequences/sequences.fasta")
-
-conposer_id(seqs.file, msa=c("ClustalW", "ClustalOmega", "Muscle"))
+conposer_id(seqs.file="sequences.fasta", msa=c("ClustalW", "ClustalOmega", "Muscle"), gap.lim=0.30)
 ```
 
 #### Arguments
 
-`seqs.file`	Path and filename fasta file containing input sequences
+`seqs.file`	Filepath to fasta file containing input sequences.
 
-`msa`	Specifies the multiple sequence alignment algorithm used to align the input sequences.
+`msa`		Specifies the multiple sequence alignment algorithm used to align the input sequences.
+
+`gap.lim`	Specifies the fraction of sequences that can have a gap at a given position. Columns with gaps greater than this fraction are ignored. (Default = 0.30) 	
 
 #### Examples
+
+```
+> df <- conposer_id("sequences.fasta", msa="ClustalOmega")
+using Gonnet
+> head(df)
+  pos AA
+1  39  G
+2  44  G
+3  51  L
+4  62  E
+5  70  R
+6  73  G
+```
 
 ### `conposer_plot()`
 
 #### Description
 
-Function for generating a gene plot of the MSA, indicating the positions of the conserved positions in 2D space.
+Function for generating a gene plot of the MSA indicating the locations of the conserved positions, plus a barplot of the number of AAs observed at each position.
 
 #### Usage
 
 ```r
 library(Biostrings)
 library(msa)
+library(dplyr)
 
-seqs.file <- readAAStringSet("data/sequences/sequences.fasta")
-
-conposer_plot(seqs.file, filename="geneplot.pdf", linecol="black", isFilter=FALSE)
-
+conposer_plot(seqs.file="sequences.fasta", filename="geneplot.pdf", linecol="black", gap.lim=0.30)
 ```
 
 #### Arguments
 
-`seqs.file`	Path and filename of fasta file containing input sequences
+`seqs.file`	Path and filename of fasta file containing input sequences.
+
 `filename`	Path and filename of output geneplot. Default is "geneplot.pdf"
-`linecol`	Color of lines indicating conserved positions. Default is "black"
-`isFilter`	Specifies if positions with gaps in >5% of the sequences in the alignment are masked. Masking these positions can avoid spuriously calling a conserved position that is really a gap in most sequences. Default = FALSE, which shows every position.
+
+`linecol`	Color of lines indicating conserved positions. Default is "black."
+
+`gap.lim`	Specifies the fraction of sequences that can have a gap at a given position. Columns with gaps greater than this fraction are ignored. (Default = 0.30) 
 
 #### Examples
+
+```r
+> conposer_plot(seqs.file="sequences.fasta", filename="geneplot.pdf", linecol="blue")
+using Gonnet
+pdf 
+  2
+```
+
+![Ex1](https://github.com/kevinsblake/ConPosER/blob/main/photos/example_01.png)
 
 ## References
 
