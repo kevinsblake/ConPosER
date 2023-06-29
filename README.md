@@ -1,4 +1,4 @@
-# ConPosER - CONserved POSition identifiER
+# ConPosER - CONserved POSition identifiER  <img align="right" src="https://github.com/kevinsblake/ConPosER/blob/main/photos/hex/hex.png" width=300>
 Identify conserved positions in amino acid multiple sequence alignments in R.
 
 The sequence-structure-function paradigm follows that a protein’s primary sequence dictates its three-dimensional structure, which in turn influences function. Sequence determinants are generally restricted to a limited number of residues, evidenced by structurally similar proteins having low sequence identity and the ability to experimentally mutate many positions along the protein sequence with no impact on activity. Those positions that do affect activity when mutated tend to be located at the protein's core or at functional sites. It follows that residues which are conserved across a protein family are likely determinants of function, as any mutations at these sites abolish function which would exclude these mutants from selection and sequencing.
